@@ -1,0 +1,369 @@
+2.ans
+
+    1--. CREATE TABLE USERS
+        (
+       UserID INT PRIMARY KEY,
+      User Name VARCHAR(255) NOT NULL,
+      Email VARCHAR(265) NOT NULL,
+      ):
+
+   2-- CREATE TABLE projects 
+     (
+     ProjectID INT PRIMARY KEY,
+     ProjectName VARCHAR(255) NOT NULL,
+     Description TEXT,
+     UserID INT,
+     CONSTRAINT FK_user_Project FOREIGN kEY(UserID) REFERENCES USERS(UserID)
+    );
+
+  3-- CREATE TABLE ISSUES (
+    IssueID INT PRIMARY KEY,
+    IssueTitle VARCHAR(255) NOT NULL,
+    Description  TEXT,
+    ProjectID INT ,
+    UserID INT,
+    CONSTRAINT FK_project_isssues FOREiGN KEY(ProjectID ) REferences Projects(ProjectID),
+    CONSTRAINT FK_project_isssues FOREiGN KEY(UserID) REFERENCES Users(UserID) 
+
+  );
+
+  4-- CREATE TABLE Collaborators
+     (
+     COllaboration ID INT PRIMARY KEY,
+     User ID INT ,
+     Project ID INT,
+     CONSTRAINT fk_USER_COLLABORATION FOREIGN KEY (UserID) References USers,
+     CONSTRAINT fk_USER_COLLABORATION FOREIGN KEY (Project ID) REFERENCES Projects,
+
+    );
+
+3 ans:
+
+   CREATE OR REPALCE PACKAGE 
+MIGRATION PACKAGE AS 
+PROCEDURE MigrateData;
+END MigrationPackage;
+CREATE OR REPLACE PACKAGE BODY MigrationPackege AS
+PROCEDURE MigrateDATA IS 
+BEGIN
+  INSERT INTO Users(UserID,UserName,Email)
+  SELECT USERID_Column,Username_column, Email_Column
+      from XXBCM_ORDER_MGT;
+  INSERT INTO Projects (ProjectID,ProjectName,Description,UserID)
+ SELECT ProjectID_Column, ProjectName_Column,Description_Column ,UserID_Column
+  From XXBCM_ORDER_MGT;
+ INSERT INTO Issues (IssueID, IssueTitle ,Description,ProjectID, UserID)
+SELECT IssueID_Column,IssueTitile_Column, Description_Column,Project_ID Column,UserID_Column
+From XXBCM_ORDER_MGT;
+INSERT INTO Collaborators(CollaboratorID,UserID,ProjectID)
+SELECT CollaboratorID_Column,UserID_Column,ProjectID_Column
+from CollaboratorID;
+COMMIT;
+EXCEPTION
+WHEN OTHERS THEN 
+ROLLBACK;
+DBMS_OUTPUT.PUT_LINE("Error During Migration:'||SQLERRM);
+END Migration Data;
+END Migration Package;
+
+
+4 Ans: 
+
+CREATE OR REPLACE PROCEDURES 
+OrderSummary Report AS 
+BEGIN 
+ for oredr_rec IN (
+SELECT TO_NUMBER(REGEXP_R REPLACE (OrderReference,'[^0-9]',"))AS OrderReference,  
+       TO_CHAR(OrderDate,'MON-YY')AS OrderPeriod ,
+       INITCAP(Supplier_name) AS SupplierName,
+       To_char(Ordaer_TotalAmount, 'FM999,999,990.00') As Order Total AMount,
+       Order Status,
+       invoice Reference,
+      To_char(InvoiceTotalAmount,FM999,999,990.00')AS invoiceTotalAmount,
+     CASE WHEN COUNT(DIstinct InvoiceStatus)=1 And MAx(Invoicestatus)='Paid' THEN 'OK'
+          WHEN COUNT(DIstinct InvoiceStatus)=1  And MAx(Invoicestatus)='Pending' then 'To Follow Up'
+     else 'Tp Verify'
+END As Action 
+from yourinvoiceTable i
+ON o.oderID=i.OrderID
+Group By OrderReference,OrderDate,SupplierName,OrderTotalamount,orderststus,invoicereference,invoiceTotalAmount
+Order By OrderDate DESC) LOOP
+DBMS_OUTPUT.PUT_Line('Order Reference: '||',Order Period: '|| 
+                        ', order_rec,order_period ||', supplierName :'||
+                             ',order_rec.supplierName||
+                          ', Order Total Amount :'||
+                             ', order_rec.OrderTotalAmount||
+                            ',order Status: '|| 
+                        ',Order_rec.orderStatus:'||
+                         ',invoice reference :'||
+                         ',order_rec.InvoiceReference||
+                           ',Invoice total Amount :'||
+                           ',order_rec.invoiceTotalAmount ||
+                            ',Action:' ||
+                            Order_rec.Action
+                        );
+              END LOOP:
+
+5 Ans: 
+
+
+ create or Replace Procedure
+getthirdhighestOrderv AS Cursor OrderCursor IS
+Select 
+Order Reference ,
+Oder Date,
+Initcap(SupplierName) As SupplierName,
+To_cahr(OrderTotalAmount,'FM999,999,990.00')As OrderTotalAMount,
+orderStatus from yourOrderstable 
+order by totalamount  Desc;
+Vcouner Number:=1;
+vOrderRef Number;
+VoderDate Date;
+Vsupplier Name Varchar2(100);
+Vorder Total Amount varchar2(20);
+Vorder status Varchar2(50);
+BEGIN
+FOR Order_rec IN OrderCursor 
+LOOP
+IF Vcounter=3 Then VorderRef:=To_NUMBER(REGEXP_REPLACE(order_rec.orderReference,'[^0-9]',");
+ VorderDate:=order_Rec.OrderDate;
+VordersupplierName :=Order_rec.SupplierName;
+VorderTotalAmount :=Order_Rec.OrderTotalAmount;
+VorderStatus :=Order_rec.OrderStaus;
+ 
+EXIT;
+END IF;
+Vcounter:=Vcounter+1;
+End Loop;
+if VOrderRef is not null THen 
+DBMS_OUTPUT.PUT_LINE('ORder Reference:' ||VOrderRef|| ,Order Date: ||
+                         TO_char(VorderDAte,'Month,DD,yyyy')||
+                         ',SupplierNAme :'|| Vsupplier NAme ||
+                         ',OrderTotalAmount: || VorderTotalAMount||
+                          ',order status: || VorderStatus ||
+                          ',Invoice Reference: ' G etlnoivoiceReferences(VorederRef)
+                       );
+Else 
+DBMS_out_put.Put_line('No Such Record Found.');
+end if;
+end Get ThirdHighestOrder;
+
+
+
+6Ans : 
+
+Create or replace procedure
+getsupplierorderdetails as 
+cursor suppliercursor is 
+select 
+suppliername,
+suppliercontactname,
+to_char(Suppliercontactno1,'999-9999')as supplier contact no1,
+to_char(Suppliercontactno2,'999-9999')as supplier contact no2,
+count(orderID) as Total Orders,
+To_Char(Sum(OrderTotalAMount),'FM999,999,990.00') as Order total AMount
+from your orders table
+where
+order date between to_date ('01-jan-2017','DD-MON-YYYY') And 
+                    To_date('31-AUG-2017','DD_MON_YYYY')
+group by Supplier Name,
+supplier conatct name,
+supplier contact no1,
+supplier constct no2;
+vsuppliername Varchar2(100);
+Vsupplierconatctname varchar2(100);
+vsupplier Contactno1 Varchar2(20);
+vsupplier Contactno2 Varchar2(20);
+vtotal orders Number ;
+vordertotal amount varchar2(20);
+begin 
+for supplier _ref In Suppliercursor Loop
+Vsuppliername:=Supplier_rec.suppliername;
+vsuppliercontactname:=Supplier_rec Suppliercontactname;
+Vsupplieconbtactno1:=supplier_rec Supplier contact no1;
+Vsupplieconbtactno2:=supplier_rec Supplier contact no2;
+vtotal orders:= Supplier_rec Total orders;
+VOrder Total amount:= Supplier_rec Order Total amount;
+dbms_output.put_line('supplier name:'|| vsupplier name||
+                      'supplier conatct name:'|| vsupplier conatct name||
+                       'supplier conatct no1:' || vsupplier contact no1||
+                      'supplier conatct no2:' || vsupplier contact no2||
+                      'Total Orders:' ||vtotalorders ||
+                       'Order Total amount :'||VOrderTotal amount||
+         );
+           ENd loop
+        END GetsupplierOrderdetails;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                           
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
